@@ -1,10 +1,9 @@
-
-
+import os
 import cv2
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten
 from keras.optimizers import Adam
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 train_data_gen = ImageDataGenerator(rescale=1./255)
@@ -12,7 +11,7 @@ validation_data_gen = ImageDataGenerator(rescale=1./255)
 
 
 train_generator = train_data_gen.flow_from_directory(
-    'Data\\train',
+    os.path.join("e_d", "Data", "train"),
     target_size=(48, 48),
     batch_size=64,
     color_mode="grayscale",
@@ -20,7 +19,7 @@ train_generator = train_data_gen.flow_from_directory(
 
 
 validation_generator = validation_data_gen.flow_from_directory(
-    'Data\\test',
+    os.path.join("e_d", "Data", "test"),
     target_size=(48, 48),
     batch_size=64,
     color_mode="grayscale",
@@ -48,21 +47,23 @@ emotion_model.add(Dense(7, activation='softmax'))
 
 cv2.ocl.setUseOpenCL(False)
 
-emotion_model.compile(loss='categorical_crossentropy', optimizer=Adam(
-    lr=0.0001, decay=1e-6), metrics=['accuracy'])
+emotion_model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=0.0001), 
+                      metrics=['accuracy'])
 
 
-emotion_model_info = emotion_model.fit_generator(
+emotion_model_info = emotion_model.fit(
     train_generator,
     steps_per_epoch=28709 // 64,
-    epochs=100,
+    epochs=20,
     validation_data=validation_generator,
     validation_steps=7178 // 64)
 
 
 model_json = emotion_model.to_json()
-with open("Model\\emotion_model.json", "w") as json_file:
+path = os.path.join("e_d", "Model", "emotion_model.json")
+with open(path, "w") as json_file:
     json_file.write(model_json)
 
+emo = os.path.join("e_d", "Model", "emotion_model.weights.h5")
 
-emotion_model.save_weights('Model\\emotion_model.h5')
+emotion_model.save_weights(emo)

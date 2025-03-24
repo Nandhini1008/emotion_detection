@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from keras.models import model_from_json
@@ -6,14 +7,14 @@ from keras.models import model_from_json
 emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful",
                 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
 
-
-json_file = open('Model\\emotion_model.json', 'r')
+path = os.path.join("e_d", "Model", "emotion_model.json")
+json_file = open(path, 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 emotion_model = model_from_json(loaded_model_json)
 
-
-emotion_model.load_weights("Model\\emotion_model.h5")
+path1 = os.path.join("e_d", "Model", "emotion_model.weights.h5")
+emotion_model.load_weights(path1)
 print("Loaded model from disk")
 
 
@@ -26,8 +27,8 @@ while True:
     frame = cv2.resize(frame, (1280, 720))
     if not ret:
         break
-    face_detector = cv2.CascadeClassifier(
-        'haarcascade\\haarcascade_frontalface_default.xml')
+    path2 = os.path.join("e_d", "Haarcascades", "haarcascade_frontalface_default.xml")
+    face_detector = cv2.CascadeClassifier(path2)
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
